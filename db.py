@@ -15,7 +15,7 @@ def _clean_key(key):
 
 def _clean_sms_status(value):
     cleaned_value = str(value).lower()
-    if cleaned_value not in ['delivered', 'failed', 'pending']:
+    if cleaned_value not in {'delivered', 'failed', 'pending'}:
         raise ValueError(f'Unknown status found: `{cleaned_value}`. Wanted one of delivered, failed or pending.')
 
     return cleaned_value

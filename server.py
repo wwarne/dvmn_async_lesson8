@@ -23,7 +23,7 @@ async def create_db_pool():
     redis = await trio_asyncio.asyncio_as_trio(aioredis.create_redis_pool)(
         settings.REDIS_URI,
         password=settings.REDIS_PASSWORD,
-        encoding='utf-8'
+        encoding='utf-8',
     )
     app.db = Database(redis)
 
@@ -31,9 +31,11 @@ async def create_db_pool():
 @app.after_serving
 async def close_db_pool():
     """Close redis connections on shutdown."""
-    if hasattr(app, 'db'):
+    try:
         app.db.redis.close()
         await trio_asyncio.asyncio_as_trio(app.db.redis.wait_closed)()
+    except AttributeError:
+        pass
 
 
 @app.route('/')
@@ -68,7 +70,7 @@ async def create():
         })
     except SmscApiError as e:
         return {
-            'errorMessage': f'получено {e}'
+            'errorMessage': f'получено {e}',
         }
     await trio_asyncio.asyncio_as_trio(app.db.add_sms_mailing)(
         sms_id=send_result['id'],
@@ -100,13 +102,13 @@ async def async_main(host: str = '127.0.0.1',
 
         if kwargs:
             warnings.warn(
-                f"Additional arguments, {','.join(kwargs.keys())}, are not supported.\n"
-                "They may be supported by Hypercorn, which is the ASGI server Quart "
-                "uses by default. This method is meant for development and debugging."
+                f'Additional arguments, {",".join(kwargs.keys())}, are not supported.\n'
+                'They may be supported by Hypercorn, which is the ASGI server Quart '
+                'uses by default. This method is meant for development and debugging.'
             )
 
-        scheme = "https" if certfile is not None and keyfile is not None else "http"
-        print(f"Running on {scheme}://{host}:{port} (CTRL + C to quit)")  # noqa: T001, T002
+        scheme = 'https' if certfile is not None and keyfile is not None else 'http'
+        print(f'Running on {scheme}://{host}:{port} (CTRL + C to quit)')  # noqa: T001, T002
 
         await app.run_task(host, port, debug, use_reloader, ca_certs, certfile, keyfile)
 
