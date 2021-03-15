@@ -16,6 +16,7 @@ from utils import redis2frontend
 
 app = QuartTrio(__name__)
 
+
 @app.before_serving
 async def create_db_pool():
     """Create and bind db_pool before start serving requests."""
@@ -25,6 +26,7 @@ async def create_db_pool():
         encoding='utf-8'
     )
     app.db = Database(redis)
+
 
 @app.after_serving
 async def close_db_pool():
@@ -38,6 +40,7 @@ async def close_db_pool():
 async def index():
     index_page = trio.Path('templates/index.html')
     return await index_page.read_text()
+
 
 @app.websocket('/ws')
 async def ws():
@@ -74,6 +77,7 @@ async def create():
     )
     return send_result
 
+
 async def async_main(host: str = '127.0.0.1',
                      port: int = 5000,
                      debug: Optional[bool] = None,
@@ -105,6 +109,7 @@ async def async_main(host: str = '127.0.0.1',
         print(f"Running on {scheme}://{host}:{port} (CTRL + C to quit)")  # noqa: T001, T002
 
         await app.run_task(host, port, debug, use_reloader, ca_certs, certfile, keyfile)
+
 
 if __name__ == '__main__':
     trio.run(async_main)
