@@ -3,7 +3,7 @@ from collections import Counter
 
 def redis2frontend(dict_from_redis):
     """
-    Convert data from format we use insi db to format needed by frontend.
+    Convert data from format we use in db to format needed by frontend.
 
     From this
     {
